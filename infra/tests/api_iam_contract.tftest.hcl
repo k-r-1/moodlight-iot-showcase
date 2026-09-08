@@ -7,16 +7,16 @@ run "api_transaction_permissions" {
   command = plan
 
   variables {
-    project_token            = "onboarding-juwon-test-m4d2"
-    environment              = "dev"
-    aws_account_id           = "123456789012"
-    owner_tag                = "juwon"
-    deployment_enabled       = true
-    company_values_confirmed = true
-    api_slice_enabled        = true
-    cognito_callback_urls    = ["openiot-moodlight://auth/callback"]
-    cognito_logout_urls      = ["openiot-moodlight://auth/logout"]
-    cors_allow_origins       = ["http://localhost:3210"]
+    project_token               = "moodlight-demo-test-m4d2"
+    environment                 = "dev"
+    aws_account_id              = "123456789012"
+    owner_tag                   = "demo-owner"
+    deployment_enabled          = true
+    deployment_values_confirmed = true
+    api_slice_enabled           = true
+    cognito_callback_urls       = ["openiot-moodlight://auth/callback"]
+    cognito_logout_urls         = ["openiot-moodlight://auth/logout"]
+    cors_allow_origins          = ["http://localhost:3210"]
   }
 
   assert {

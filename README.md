@@ -1,6 +1,6 @@
 # ESP32-S3 무드등 IoT 토이 프로젝트
 
-> 회사 온보딩에서 배운 인증, 기기 격리, Fleet Provisioning, MQTT, Topic Rule, 서버리스 백엔드를 실제 무드등으로 구현하는 학습 프로젝트
+> 기기 인증, 메시지 격리, Fleet Provisioning, MQTT, Topic Rule, 서버리스 백엔드를 실제 무드등으로 구현한 IoT 학습 프로젝트
 
 - **개발·검증 기간:** 2026-09-03 ~ 2026-09-08 (실작업 4일)
 
@@ -20,9 +20,9 @@
 
 ## 현재 상태
 
-2026-09-08 기준, **Cognito 로그인 → BLE Security 2 → Wi-Fi 설정 → Fleet Provisioning → 기기별 X.509·Thing → IoT Core 제어 → 상태 저장 → 예약 실행**을 개인 격리 dev AWS와 실제 ESP32-S3·Android 앱에서 종단간 확인했다. 외장 RGB의 전원·순색·혼합색·밝기와 예약 색상 적용도 실물로 확인했다.
+2026-09-08 기준, **Cognito 로그인 → BLE Security 2 → Wi-Fi 설정 → Fleet Provisioning → 기기별 X.509·Thing → IoT Core 제어 → 상태 저장 → 예약 실행**을 전용 격리 dev AWS와 실제 ESP32-S3·Android 앱에서 종단간 확인했다. 외장 RGB의 전원·순색·혼합색·밝기와 예약 색상 적용도 실물로 확인했다.
 
-Android `standalone` APK는 Next.js 정적 화면을 안에 포함하여 **Amplify·Metro·휴대폰 USB 없이** 실제 개인 Cognito·API를 사용한다. ESP32는 별도 전원과 Wi-Fi가 필요하다. 현재 제어는 온라인 `cmd → state`이며, 오프라인 중 명령 자동 복구는 후속 과제다.
+Android `standalone` APK는 Next.js 정적 화면을 안에 포함하여 **Amplify·Metro·휴대폰 USB 없이** 배포된 Cognito·API를 사용한다. ESP32는 별도 전원과 Wi-Fi가 필요하다. 현재 제어는 온라인 `cmd → state`이며, 오프라인 중 명령 자동 복구는 후속 과제다.
 
 | 영역 | 상태 | 다음 확인 |
 |---|---|---|
@@ -30,7 +30,7 @@ Android `standalone` APK는 Next.js 정적 화면을 안에 포함하여 **Ampli
 | MCU 모듈 | 확인 | 실물 각인과 Espressif 데이터시트 기준 `ESP32-S3-WROOM-1-N16R8` — Flash 16MB, PSRAM 8MB |
 | 개발 보드 | 높은 신뢰도로 식별 | 사진의 44핀 배열, `COM`·`USB` USB-C 2개, LED·점퍼 배치가 `YD-ESP32-S3` DevKitC-1 호환 보드와 일치. 모듈은 `N16R8`; GPIO48 내장 RGB는 실제 점등 확인. 제조사·회로 revision은 미확인 |
 | 외부 RGB 모듈 | **실기기 확인** | 공통 음극 `-→GND`, `R→GPIO4`, `G→GPIO5`, `B→GPIO6`; 순색·혼합색·밝기·소등 확인 |
-| 클라우드 | **개인 격리 dev 배포·검증 완료** | 업무용 DynamoDB 7개 + Device Registry 1개(총 8개), Cognito·HTTP API, Lambda, IoT/Fleet·Topic Rule·Scheduler를 고유 접두사와 태그로 분리. 적용 뒤 `No changes` 확인 |
+| 클라우드 | **전용 격리 dev 배포·검증 완료** | 업무용 DynamoDB 7개 + Device Registry 1개(총 8개), Cognito·HTTP API, Lambda, IoT/Fleet·Topic Rule·Scheduler를 고유 접두사와 태그로 분리. 적용 뒤 `No changes` 확인 |
 | 구현 | **목표 종단 흐름 완료** | 앱·브리지·QR·Security 2·Wi-Fi, Claim·Registry·Fleet 등록·Runtime 정책 전환, MQTT `cmd/state/tele/evt`, Ingest, 제어·예약 |
 | 검증 | **Web 21/21, Mobile 51/51, Backend 101/101, Firmware 28/28, 자격정보 생성기 2/2** 및 타입·빌드 검사 통과. 펌웨어 업로드·flash hash, Terraform 적용 후 `No changes`, 실제 로그인·등록·제어·상태·예약 확인 | 잘못된 QR·변조·재전송 등 부정 시나리오, 소유권 해제→재등록, 오프라인 명령 복구 |
 
@@ -56,7 +56,7 @@ Android `standalone` APK는 Next.js 정적 화면을 안에 포함하여 **Ampli
 
 > 제품 QR, 등록 비밀, 인증서와 계정 정보가 보이는 화면은 저장소에 포함하지 않는다.
 
-시험에는 집과 회사에서 같은 SSID·비밀번호를 유지할 수 있는 **개인 핫스팟**을 사용했다. ESP32가 저장한 Wi-Fi 설정으로 장소가 바뀌어도 재등록 없이 자동 재접속하고, 회사 네트워크와 분리된 환경에서 시험하기 위한 선택이다. 핫스팟 사용은 기기 소유권을 정하는 절차가 아니며, 소유권은 Cognito 로그인·Claim·Fleet 등록·첫 runtime `state`로 확정한다.
+시험에는 장소가 바뀌어도 동일한 SSID·비밀번호를 유지할 수 있는 **개인 핫스팟**을 사용했다. ESP32가 저장한 Wi-Fi 설정으로 재등록 없이 자동 재접속하고, 다른 네트워크와 분리된 환경에서 시험하기 위한 선택이다. 핫스팟 사용은 기기 소유권을 정하는 절차가 아니며, 소유권은 Cognito 로그인·Claim·Fleet 등록·첫 runtime `state`로 확정한다.
 
 ## MQTT 토픽 설계
 
@@ -136,8 +136,8 @@ moodlight-iot-showcase/
 | `webapp/` | Next.js 정적 웹앱 | 로그인, 기기 홈, 제어·예약 화면과 등록 화면 흐름 |
 | `mobile/` | React Native·Expo Android 앱 | 독립 APK, WebView 컨테이너, Cognito PKCE, BLE 권한·검색·Security 2·Wi-Fi, 네이티브 브리지 |
 | `firmware/` | ESP-IDF | RGB LED, BLE, Wi-Fi, Fleet Provisioning, MQTT |
-| `backend/` | TypeScript·AWS Lambda | 소유권·Claim, Registry 1회 소비, Fleet finalize, 명령·수집·예약·해제와 AWS 어댑터. 개인 격리 dev에서 Fleet·Runtime·제어·상태 수집·예약 종단 검증 완료 |
-| `infra/` | Terraform | 기본 OFF 안전 guard와 격리 dev DynamoDB·Cognito·HTTP API·Lambda·IoT/Fleet·Registry·Hook·Rule·Scheduler 선언. 현재 회사 Mac의 Git 제외 설정으로 필요한 단계만 활성화 |
+| `backend/` | TypeScript·AWS Lambda | 소유권·Claim, Registry 1회 소비, Fleet finalize, 명령·수집·예약·해제와 AWS 어댑터. 전용 격리 dev에서 Fleet·Runtime·제어·상태 수집·예약 종단 검증 완료 |
+| `infra/` | Terraform | 기본 OFF 안전 guard와 격리 dev DynamoDB·Cognito·HTTP API·Lambda·IoT/Fleet·Registry·Hook·Rule·Scheduler 선언. 실제 설정값은 Git에서 제외하고 필요한 단계만 활성화 |
 
 ## 현재 앱 경계
 

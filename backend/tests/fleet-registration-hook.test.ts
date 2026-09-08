@@ -7,7 +7,7 @@ const config = {
   registryTable: "moodlight-device-registry",
   templateArn: "arn:aws:iot:ap-northeast-2:123456789012:provisioningtemplate/moodlight-fleet",
   claimCertificateId: "a".repeat(64),
-  clientIdPrefix: "openiot-onboarding-juwon-test-dev-claim-",
+  clientIdPrefix: "openiot-moodlight-demo-test-dev-claim-",
 };
 
 class FakeClient {

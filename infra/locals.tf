@@ -2,7 +2,7 @@ locals {
   prefix = "openiot-${var.project_token}-${var.environment}"
 
   # One AWS account/Region has one IoT data endpoint. A unique first topic
-  # segment and Thing prefix keep this lab outside every company project tree.
+  # segment and Thing prefix keep this lab outside other project trees.
   iot_topic_root       = "${var.project_token}/${var.environment}/tenants"
   iot_topic_root_depth = length(split("/", local.iot_topic_root))
   iot_thing_prefix     = "${local.prefix}-lamp-"

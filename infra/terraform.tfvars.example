@@ -7,7 +7,7 @@ aws_account_id = ""
 owner_tag      = "unconfirmed"
 
 deployment_enabled       = false
-company_values_confirmed = false
+deployment_values_confirmed = false
 api_slice_enabled        = false
 enable_iot_fleet         = false
 enable_iot_rules         = false

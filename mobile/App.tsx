@@ -47,7 +47,7 @@ import {
 
 WebBrowser.maybeCompleteAuthSession();
 
-// Handoff builds stay embedded. At the company, use localhost:3210 with adb reverse for
+// Handoff builds stay embedded. During local development, use localhost:3210 with adb reverse for
 // live debug, or set an exact HTTPS tunnel/Amplify URL and rebuild when that URL changes.
 const EMBEDDED_WEBAPP = Platform.OS === "android" && process.env.EXPO_PUBLIC_EMBEDDED_WEBAPP === "true";
 const WEBAPP_URL = EMBEDDED_WEBAPP
@@ -122,7 +122,7 @@ export default function App() {
   const establishAuthenticatedSession = useCallback(async (accessToken: string, requestId?: string, notifyWeb = true, expectedOperation = authOperationRef.current): Promise<AuthenticatedApiSession> => {
     const isCurrent = () => expectedOperation === authOperationRef.current;
     if (!isCurrent()) throw new StaleAuthenticationOperationError();
-    if (!API_BASE_URL) throw new NativeBoundaryError("AUTH_NOT_CONFIGURED", "회사 AWS API 주소 설정이 필요합니다.", false);
+    if (!API_BASE_URL) throw new NativeBoundaryError("AUTH_NOT_CONFIGURED", "AWS API 주소 설정이 필요합니다.", false);
     const bootstrap = await bootstrapApiSession(API_BASE_URL, accessToken);
     if (!isCurrent()) throw new StaleAuthenticationOperationError();
     const session = { apiBaseUrl: API_BASE_URL, accessToken, tenantId: bootstrap.tenantId };
@@ -234,7 +234,7 @@ export default function App() {
         return;
       }
       if (!config || !API_BASE_URL) {
-        publishAuthState({ status: "signed-out", message: "회사 AWS Cognito와 API 설정을 연결하면 로그인할 수 있어요." });
+        publishAuthState({ status: "signed-out", message: "AWS Cognito와 API 설정을 연결하면 로그인할 수 있어요." });
         return;
       }
       publishAuthState({ status: "loading", message: "저장된 로그인을 확인하고 있어요." });
@@ -304,7 +304,7 @@ export default function App() {
       publishAuthState({ status: "loading", message: "Cognito 로그인 화면을 열고 있어요." }, message.requestId);
       try {
         const config = cognitoAuthConfig();
-        if (!config || !API_BASE_URL) throw new NativeBoundaryError("AUTH_NOT_CONFIGURED", "회사 AWS Cognito와 API 설정이 필요합니다.", false);
+        if (!config || !API_BASE_URL) throw new NativeBoundaryError("AUTH_NOT_CONFIGURED", "AWS Cognito와 API 설정이 필요합니다.", false);
         const tokens = await signInWithCognito(config, () => operation === authOperationRef.current);
         if (!tokens || operation !== authOperationRef.current) return;
         await establishAuthenticatedSession(tokens.accessToken, message.requestId, true, operation);

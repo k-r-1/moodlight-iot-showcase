@@ -5,12 +5,12 @@ run "isolated_fleet_contract" {
   command = plan
 
   variables {
-    project_token            = "onboarding-juwon-test-m4d2"
-    environment              = "dev"
-    aws_account_id           = "123456789012"
-    owner_tag                = "juwon"
-    deployment_enabled       = true
-    company_values_confirmed = true
+    project_token                   = "moodlight-demo-test-m4d2"
+    environment                     = "dev"
+    aws_account_id                  = "123456789012"
+    owner_tag                       = "demo-owner"
+    deployment_enabled              = true
+    deployment_values_confirmed     = true
     api_slice_enabled               = false
     enable_iot_fleet                = true
     enable_iot_rules                = false
@@ -39,14 +39,14 @@ run "isolated_fleet_contract" {
   }
 
   assert {
-    condition     = local.iot_topic_root == "onboarding-juwon-test-m4d2/dev/tenants" && local.iot_topic_root_depth == 3
+    condition     = local.iot_topic_root == "moodlight-demo-test-m4d2/dev/tenants" && local.iot_topic_root_depth == 3
     error_message = "The unique project/environment namespace or topic() indexes drifted."
   }
 
   assert {
     condition = (
       length(local.runtime_policy) <= 2048 &&
-      strcontains(local.runtime_policy, ":topic/onboarding-juwon-test-m4d2/dev/tenants/") &&
+      strcontains(local.runtime_policy, ":topic/moodlight-demo-test-m4d2/dev/tenants/") &&
       !strcontains(local.runtime_policy, "\"Action\":[\"iot:*\"]")
     )
     error_message = "Runtime policy must fit the IoT limit and remain inside the isolated topic tree without iot:* actions."
@@ -62,12 +62,12 @@ run "fleet_registration_guard_contract" {
   command = plan
 
   variables {
-    project_token                   = "onboarding-juwon-test-m4d2"
+    project_token                   = "moodlight-demo-test-m4d2"
     environment                     = "dev"
     aws_account_id                  = "123456789012"
-    owner_tag                       = "juwon"
+    owner_tag                       = "demo-owner"
     deployment_enabled              = true
-    company_values_confirmed        = true
+    deployment_values_confirmed     = true
     api_slice_enabled               = true
     cognito_callback_urls           = ["moodlight://auth/callback"]
     cognito_logout_urls             = ["moodlight://auth/logout"]
@@ -92,8 +92,8 @@ run "fleet_registration_guard_contract" {
   assert {
     condition = (
       aws_lambda_permission.fleet_registration_hook[0].source_account == "123456789012" &&
-      aws_lambda_permission.fleet_registration_hook[0].source_arn == "arn:aws:iot:ap-northeast-2:123456789012:provisioningtemplate/onb-juwon-test-m4d2-dev-fleet" &&
-      aws_lambda_function.fleet_registration_hook[0].environment[0].variables.FLEET_CLAIM_CLIENT_ID_PREFIX == "openiot-onboarding-juwon-test-m4d2-dev-claim-"
+      aws_lambda_permission.fleet_registration_hook[0].source_arn == "arn:aws:iot:ap-northeast-2:123456789012:provisioningtemplate/ml-demo-test-m4d2-dev-fleet" &&
+      aws_lambda_function.fleet_registration_hook[0].environment[0].variables.FLEET_CLAIM_CLIENT_ID_PREFIX == "openiot-moodlight-demo-test-m4d2-dev-claim-"
     )
     error_message = "Fleet may invoke the hook only from this exact account, template, and project client-id prefix."
   }

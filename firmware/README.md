@@ -112,7 +112,7 @@ GPIO와 누름 시간은 menuconfig의 `Moodlight firmware`에서 바꿀 수 있
 
 ## MQTT runtime
 
-AWS IoT MQTT runtime은 기본값이 **비활성**이다. 실제 endpoint와 기기 인증서가 없는 일반 로컬 빌드에서는 기존 BLE·Wi-Fi·시리얼·LED 동작만 사용한다. 개인 격리 dev 시험에서는 Git 제외 설정으로 Fleet·MQTT 옵션을 켜 종단 검증했으며, 다른 환경에서는 그 환경의 endpoint·정책·기기별 값을 확인한 뒤에만 활성화한다.
+AWS IoT MQTT runtime은 기본값이 **비활성**이다. 실제 endpoint와 기기 인증서가 없는 일반 로컬 빌드에서는 기존 BLE·Wi-Fi·시리얼·LED 동작만 사용한다. 전용 격리 dev 시험에서는 Git 제외 설정으로 Fleet·MQTT 옵션을 켜 종단 검증했으며, 다른 환경에서는 그 환경의 endpoint·정책·기기별 값을 확인한 뒤에만 활성화한다.
 
 endpoint, Thing 이름, topic base, Root CA, 기기 인증서, private key는 Git에서 제외된 `firmware/local/mqtt_credentials.h`에만 둔다. 다음 도구는 기존 파일을 덮어쓰지 않고 값을 화면에 출력하지 않는다.
 
@@ -138,12 +138,12 @@ runtime은 TLS 8883으로 Thing 이름과 같은 clientId를 사용하고 자기
 
 MQTT 연결 시 현재 `state`를 먼저 보내 등록의 첫 runtime 상태 경로를 열고, 설정 주기마다 `tele`에 uptime·RSSI·펌웨어 버전을 보낸다. `evt`의 `occurredAt` 계약을 지키기 위해 SNTP로 유효한 UTC가 확인된 뒤 `BOOT`를 보내며 잘못된 명령·적용 실패도 가능한 연결 상태에서는 오류 event로 보고한다. payload의 Tenant·Pool·Thing은 기기가 넣지 않고 Topic Rule이 토픽에서 추출한다.
 
-Fleet 구현은 Claim 인증서로 인증서를 생성하고 RegisterThing 응답의 ThingName·`DeviceConfiguration.topicBase`를 엄격히 검증해 인증서·개인키와 함께 전용 NVS에 저장한다. 파티션 구조는 NVS 암호화를 준비했지만 대표 확인에 따라 토이 시험에서는 저장 암호화를 생략했고 기본 빌드는 계속 OFF다. 최초 발급과 같은 부팅에서는 runtime을 시작하지 않으며, 서버가 Runtime 정책 전환을 완료한 뒤 전원을 재시작하면 저장된 기기별 자격정보로 runtime MQTT를 시작한다. 개인 격리 dev에서 실제 AWS endpoint·Fleet·정책 전환·Topic Rule·Ingest·제어·예약까지 실기기 종단 연결을 확인했다.
+Fleet 구현은 Claim 인증서로 인증서를 생성하고 RegisterThing 응답의 ThingName·`DeviceConfiguration.topicBase`를 엄격히 검증해 인증서·개인키와 함께 전용 NVS에 저장한다. 파티션 구조는 NVS 암호화를 준비했지만 토이 시험에서는 저장 암호화를 생략했고 기본 빌드는 계속 OFF다. 최초 발급과 같은 부팅에서는 runtime을 시작하지 않으며, 서버가 Runtime 정책 전환을 완료한 뒤 전원을 재시작하면 저장된 기기별 자격정보로 runtime MQTT를 시작한다. 전용 격리 dev에서 실제 AWS endpoint·Fleet·정책 전환·Topic Rule·Ingest·제어·예약까지 실기기 종단 연결을 확인했다.
 
 
 ## 재현 가능한 외장 RGB 빌드
 
-회사나 다른 PC에서도 메뉴를 다시 누르지 않고 같은 외장 출력 설정을 만들려면 새 build 디렉터리와 추적되는 `sdkconfig.external-rgb.defaults`를 사용한다. 공통 `sdkconfig.defaults`를 먼저 읽어 16MB Flash, 파티션, BLE Security 2 설정을 유지하고 외장 프리셋을 나중에 적용한다.
+다른 PC에서도 메뉴를 다시 누르지 않고 같은 외장 출력 설정을 만들려면 새 build 디렉터리와 추적되는 `sdkconfig.external-rgb.defaults`를 사용한다. 공통 `sdkconfig.defaults`를 먼저 읽어 16MB Flash, 파티션, BLE Security 2 설정을 유지하고 외장 프리셋을 나중에 적용한다.
 
 ```powershell
 idf.py -B build-external -D SDKCONFIG=build-external/sdkconfig -D "SDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.external-rgb.defaults" set-target esp32s3

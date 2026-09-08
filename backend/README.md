@@ -19,7 +19,7 @@ npm run build
 - finalize: AWS IoT Thing 속성·기기 인증서·출고 원장 결속 검증과 Runtime 정책 전환이 필요
 - 기기 제어: AWS IoT Data Plane의 기기별 `cmd` Publish가 필요
 
-출고 Registry 어댑터, Fleet 사전 검증 Hook, Registry·Thing·인증서 검증과 Runtime 정책 전환을 구현했다. 개인 격리 dev에는 API·Ingest·Scheduled Lambda와 `state/tele/evt` Topic Rule을 배포했고, 실제 ESP32의 Fleet 등록·Runtime 전환·첫 `state`·제어·예약까지 확인했다. 설정이 없는 새 환경에서는 계속 `NOT_CONFIGURED`로 닫히며, 위험 권한의 Terraform guard 기본값도 비활성이다.
+출고 Registry 어댑터, Fleet 사전 검증 Hook, Registry·Thing·인증서 검증과 Runtime 정책 전환을 구현했다. 전용 격리 dev에는 API·Ingest·Scheduled Lambda와 `state/tele/evt` Topic Rule을 배포했고, 실제 ESP32의 Fleet 등록·Runtime 전환·첫 `state`·제어·예약까지 확인했다. 설정이 없는 새 환경에서는 계속 `NOT_CONFIGURED`로 닫히며, 위험 권한의 Terraform guard 기본값도 비활성이다.
 
 ## 구현한 로컬 계약
 
@@ -37,7 +37,7 @@ npm run build
 
 도메인의 `expiresAt`은 API와 테스트에서 읽기 쉬운 ISO 8601 문자열이다. DynamoDB 저장 어댑터에서는 같은 의미의 TTL 속성 `expiresAt`을 반드시 **Number 형 Unix epoch seconds**로 직렬화하고, 읽을 때 ISO 문자열로 복원한다. 문자열을 DynamoDB TTL 속성에 그대로 저장하면 자동 삭제가 동작하지 않는다.
 
-Registration code와 Fleet 전환 어댑터는 전용 환경 변수와 두 guard가 모두 켜진 환경에서만 활성화된다. 개인 격리 dev에서는 Fleet Provisioning·Runtime 전환·IoT Core `cmd` Publish와 `state` 반영을 실기기로 검증했다. 다른 환경은 같은 설정과 검증 없이 완료로 해석하지 않으며 최신 적용 상태는 루트 `README.md`을 기준으로 한다.
+Registration code와 Fleet 전환 어댑터는 전용 환경 변수와 두 guard가 모두 켜진 환경에서만 활성화된다. 전용 격리 dev에서는 Fleet Provisioning·Runtime 전환·IoT Core `cmd` Publish와 `state` 반영을 실기기로 검증했다. 다른 환경은 같은 설정과 검증 없이 완료로 해석하지 않으며 최신 적용 상태는 루트 `README.md`을 기준으로 한다.
 
 ## Lambda 실행 계약
 
@@ -62,6 +62,6 @@ Registration code와 Fleet 전환 어댑터는 전용 환경 변수와 두 guard
 | GET/PATCH | `/schedules/{scheduleId}` | 예약 조회와 revision 조건 변경 |
 | POST | `/schedules/{scheduleId}/delete|retry|reconcile` | 삭제 동기화·오류 재시도·상태 복구 |
 
-Lambda에는 기존 변수에 `TABLE_TENANT`, `TABLE_POOL`, `TABLE_SCHEDULE`이 추가된다. 개인 격리 dev의 Registry 검증·Fleet 증명·정책 전환·Scheduler·IoT `cmd` Publisher·Ingest는 실제 AWS 어댑터가 연결됐다. 소유권 해제용 인증서 폐기 어댑터도 구현했지만 `해제 → 재등록` 실기기 종단 검증 전이라 앱 버튼은 비활성으로 둔다.
+Lambda에는 기존 변수에 `TABLE_TENANT`, `TABLE_POOL`, `TABLE_SCHEDULE`이 추가된다. 전용 격리 dev의 Registry 검증·Fleet 증명·정책 전환·Scheduler·IoT `cmd` Publisher·Ingest는 실제 AWS 어댑터가 연결됐다. 소유권 해제용 인증서 폐기 어댑터도 구현했지만 `해제 → 재등록` 실기기 종단 검증 전이라 앱 버튼은 비활성으로 둔다.
 
 최신 검증 건수와 AWS 적용 상태는 루트 `README.md`을 기준으로 한다.

@@ -3,8 +3,8 @@ locals {
   iot_rules_enabled = local.iot_enabled && var.enable_iot_rules
   iot_arn_prefix    = "arn:aws:iot:${var.aws_region}:${var.aws_account_id}"
   # Provisioning template names are limited to 36 characters. Keep the full
-  # unique onboarding token, shortening only the fixed "onboarding" word.
-  fleet_name = "${replace(var.project_token, "onboarding-", "onb-")}-${var.environment}-fleet"
+  # unique project token, shortening only the fixed "moodlight" word.
+  fleet_name = "${replace(var.project_token, "moodlight-", "ml-")}-${var.environment}-fleet"
 
   runtime_policy = jsonencode({
     Version = "2012-10-17"
@@ -100,7 +100,7 @@ resource "aws_iot_thing_type" "moodlamp" {
   name  = "${local.prefix}-moodlamp"
 
   properties {
-    description           = "Isolated onboarding mood lamp"
+    description           = "Isolated mood light device"
     searchable_attributes = ["tenant_id", "pool_id", "serial"]
   }
 

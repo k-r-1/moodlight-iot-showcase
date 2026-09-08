@@ -1357,7 +1357,7 @@ export default function HomePage() {
 
           {stage === "provisioning" && <div className="centerBlock"><div className="spinner" /><h1>기기를 등록하고 있어요.</h1><p>{progress}</p><div className="progressTrack"><span /></div></div>}
 
-          {stage === "wifi-connected" && <div className="centerBlock">{hardwareTestMode ? <div className="successIcon">✓</div> : fleetRetryAvailable ? null : <div className="spinner" />}<h1>Wi-Fi 연결을 확인했어요.</h1><p>{hardwareTestMode ? `${progress} AWS 기기 등록은 회사에서 이어서 연결합니다.` : progress}</p>{fleetRetryAvailable && <button className="primary" onClick={retryFleetRegistration}>등록 상태 다시 확인</button>}<button className="secondary" onClick={leaveProvisioning}>{hardwareTestMode ? "시험 종료" : "등록 취소"}</button></div>}
+          {stage === "wifi-connected" && <div className="centerBlock">{hardwareTestMode ? <div className="successIcon">✓</div> : fleetRetryAvailable ? null : <div className="spinner" />}<h1>Wi-Fi 연결을 확인했어요.</h1><p>{hardwareTestMode ? `${progress} AWS 기기 등록은 배포 환경에서 이어서 연결합니다.` : progress}</p>{fleetRetryAvailable && <button className="primary" onClick={retryFleetRegistration}>등록 상태 다시 확인</button>}<button className="secondary" onClick={leaveProvisioning}>{hardwareTestMode ? "시험 종료" : "등록 취소"}</button></div>}
 
           {stage === "complete" && <div className="centerBlock"><div className="successIcon">✓</div><h1>{demoMode ? "데모 등록이 완료됐어요!" : "무드등 등록이 완료됐어요!"}</h1><p>{demoMode ? "가상 무드등으로 제어 흐름을 확인할 수 있습니다." : progress}</p><button className="primary" onClick={() => { cleanupProvisioning(); if (demoMode) setScreen("device"); else { setScreen("home"); loadDevices(); } }}>{demoMode ? "무드등 제어하기" : "기기 목록 보기"}</button></div>}
           {stage === "failed" && wifiFailure && (

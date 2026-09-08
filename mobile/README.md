@@ -1,6 +1,6 @@
 # Mobile WebView shell
 
-리로크에서 확인한 구조를 참고해 Next.js 웹앱을 표시하고, 웹에서 직접 할 수 없는 BLE 작업만 Expo 네이티브 코드가 담당한다.
+Next.js 웹앱을 표시하고, 웹에서 직접 할 수 없는 BLE 작업만 Expo 네이티브 코드가 담당한다.
 
 ## 현재 구현 범위
 
@@ -16,7 +16,7 @@
 - 같은 Security 2 `ESPDevice` 세션에서 주변 Wi-Fi 이름·신호·보안 여부를 읽어 WebView에 전달하는 `scanWifiNetworks`
 - 현재 등록 시도와 선택 기기를 다시 확인한 뒤 같은 Security 2 세션에서 ESP-IDF 표준 Wi-Fi provisioning을 호출하는 `provisionWifi`
 
-## 개인 격리 AWS에서 종단 확인한 것
+## 전용 격리 AWS에서 종단 확인한 것
 
 - Cognito Hosted UI Authorization Code + PKCE 로그인, Refresh token의 SecureStore 보관, Access token의 Native 메모리 보관
 - WebView에 토큰을 넘기지 않고 허용된 API 요청만 Native가 대행하는 브리지
@@ -24,7 +24,7 @@
 - 앱 재시작 뒤 pending Claim 복구와 `ONLINE` 상태 polling
 - 기기 목록·제어·예약 API 대행
 
-위 항목은 코드와 자동 테스트가 있으며, 개인 격리 dev에서 Cognito 로그인부터 제품 QR·Security 2·Wi-Fi·Fleet·첫 `state`·제어·예약까지 실제 Android와 ESP32로 확인했다. 잘못된 QR·가짜 기기·변조·재전송·재연결 공격 시험, 소유권 해제 뒤 재등록과 Wi-Fi 실패 경로의 추가 실기기 시험은 남아 있다.
+위 항목은 코드와 자동 테스트가 있으며, 전용 격리 dev에서 Cognito 로그인부터 제품 QR·Security 2·Wi-Fi·Fleet·첫 `state`·제어·예약까지 실제 Android와 ESP32로 확인했다. 잘못된 QR·가짜 기기·변조·재전송·재연결 공격 시험, 소유권 해제 뒤 재등록과 Wi-Fi 실패 경로의 추가 실기기 시험은 남아 있다.
 
 소유권 해제 API 대행과 서버 정리 어댑터는 구현했지만, 단일 시험 기기의 해제 후 재등록 검증 전이라 앱의 해제 버튼은 비활성이다.
 
@@ -59,12 +59,12 @@ Node 테스트 51/51는 실제 TypeScript 코드를 실행하되 BLE 하드웨�
 
 `npm run android:handoff`는 로컬 실기기 시험용 webapp 정적 배포본과 React Native JS를 함께 넣은 release APK를 만든다. 이 APK는 Metro·외부 Web URL·AWS 없이 실행되며 개인 실습용 debug 키로 서명된다. 출력은 `android/app/build/outputs/apk/release/app-release.apk`, 설치는 `npm run android:handoff:install`이다. 상용 배포용으로 사용하지 않는다.
 
-`npm run android:standalone`은 같은 정적 화면을 APK에 넣되 **실제 Cognito 로그인과 API**를 사용한다. 빌드할 때 개인 격리 AWS의 API·Cognito 환경 변수가 필요하고, 완성된 APK는 Metro·Next.js 서버·`adb reverse`·USB·Amplify 없이 실행한다. 화면·Native 코드·AWS 접속 설정이 바뀌면 다시 빌드해 설치한다.
+`npm run android:standalone`은 같은 정적 화면을 APK에 넣되 **실제 Cognito 로그인과 API**를 사용한다. 빌드할 때 배포한 AWS의 API·Cognito 환경 변수가 필요하고, 완성된 APK는 Metro·Next.js 서버·`adb reverse`·USB·Amplify 없이 실행한다. 화면·Native 코드·AWS 접속 설정이 바뀌면 다시 빌드해 설치한다.
 
 | 빌드 | AWS 사용 | USB·개발 서버 없이 실행 | 용도 |
 |---|---:|---:|---|
 | `android:handoff` | 아니요 | 예 | 화면·BLE를 서버 없이 확인 |
-| `android:standalone` | 예 | 예 | 개인 격리 AWS 종단 시험 |
+| `android:standalone` | 예 | 예 | 전용 격리 AWS 종단 시험 |
 
 이미 만든 APK를 Android 실기기에 설치할 때만 USB 디버깅 연결 후 아래 명령을 사용한다.
 
@@ -75,7 +75,7 @@ npm run android:install
 React Native 0.85.3의 Gradle 설정이 Gradle 9와 충돌하는 문제는 설치 후 스크립트가 `foojay-resolver-convention` 1.0.0으로 제한적으로 보정한다. 예상한 원문이 아니면 자동 수정하지 않고 실패한다.
 
 
-## WebView 실행 모드와 집·회사 공통 개발 절차
+## WebView 실행 모드와 서로 다른 개발 PC 공통 개발 절차
 
 현재 구조는 용도에 따라 세 가지 모드로 운용한다.
 
@@ -83,7 +83,7 @@ React Native 0.85.3의 Gradle 설정이 Gradle 9와 충돌하는 문제는 설�
 |---|---|---:|---|
 | Embedded handoff | `file:///android_asset/webapp/index.html` | 필요 | 서버 없이 재현하는 인계·기준본 |
 | Embedded standalone | `file:///android_asset/webapp/index.html` | 필요 | 실제 Cognito·API를 쓰는 USB 없는 시험본 |
-| 로컬 live 개발 | 개발 PC의 `http://localhost:3210` | 웹 수정만이면 불필요 | 집·회사에서 빠르게 화면과 BLE Bridge 확인 |
+| 로컬 live 개발 | 개발 PC의 `http://localhost:3210` | 웹 수정만이면 불필요 | 개발 중 화면과 BLE Bridge를 빠르게 확인 |
 | Amplify staging/운영 | 고정된 `https://...` origin | 웹 수정만이면 불필요 | 공유 시험과 운영 배포 |
 
 Embedded handoff는 버리지 않는다. 네트워크나 배포 상태와 관계없이 동일한 화면·Native Bridge를 재현하는 기준 APK다. `npm run android:handoff`가 Web의 정적 `out/`을 먼저 만들고 `android/app/src/main/assets/webapp/`에 복사한 다음 React Native JS까지 포함한 release APK를 만든다.
@@ -129,24 +129,24 @@ cd mobile
 EXPO_PUBLIC_WEBAPP_URL=http://localhost:3210 npm run android
 ```
 
-`adb reverse`는 USB 연결이 유지되는 동안 기기의 `localhost`를 현재 개발 PC로 전달하므로 집과 회사에서 IP를 바꿔 적을 필요가 없다. 네이티브 코드·권한·플러그인이 바뀌면 debug APK를 다시 빌드·설치해야 한다. Web 화면만 바뀌면 Next Fast Refresh가 반영하므로 APK를 다시 설치하지 않는다. 환경 변수를 바꾼 경우에는 Metro를 다시 시작한다.
+`adb reverse`는 USB 연결이 유지되는 동안 기기의 `localhost`를 현재 개발 PC로 전달하므로 개발 장소가 바뀌어도 IP를 다시 적을 필요가 없다. 네이티브 코드·권한·플러그인이 바뀌면 debug APK를 다시 빌드·설치해야 한다. Web 화면만 바뀌면 Next Fast Refresh가 반영하므로 APK를 다시 설치하지 않는다. 환경 변수를 바꾼 경우에는 Metro를 다시 시작한다.
 
 로컬 HTTPS 인증서를 Android에 배포하는 복잡성은 현재 실기기 개발에 필요하지 않다. 로컬 HTTP는 debug 빌드와 USB 터널에서만 허용한다. release 원격 모드는 `build-android.sh release`와 앱 시작 전 검사 양쪽에서 사용자정보가 없는 HTTPS URL만 허용한다.
 
-Amplify에는 먼저 staging용 고정 HTTPS origin을 만들고 그 주소를 `EXPO_PUBLIC_WEBAPP_URL`에 넣어 원격 release APK를 빌드한다. WebView는 그 정확한 origin만 허용하므로 Amplify 브랜치별 임시 주소보다 환경별 고정 도메인이 적합하다. 웹 배포만 바뀌면 APK 재설치 없이 새 화면을 받을 수 있지만 Native Bridge 계약이나 Android 권한이 바뀌면 새 APK가 필요하다. 실제 Amplify 앱 생성, 회사 Git 연결, 도메인·Cognito callback·CORS 값 확정은 회사 AWS 계정에서 검토 후 실행한다.
+Amplify에는 먼저 staging용 고정 HTTPS origin을 만들고 그 주소를 `EXPO_PUBLIC_WEBAPP_URL`에 넣어 원격 release APK를 빌드한다. WebView는 그 정확한 origin만 허용하므로 Amplify 브랜치별 임시 주소보다 환경별 고정 도메인이 적합하다. 웹 배포만 바뀌면 APK 재설치 없이 새 화면을 받을 수 있지만 Native Bridge 계약이나 Android 권한이 바뀌면 새 APK가 필요하다. 실제 Amplify 앱 생성, 배포용 Git 연결, 도메인·Cognito callback·CORS 값 확정은 AWS 계정에서 검토 후 실행한다.
 
 이 로컬 live 절차는 현재 코드와 생성된 debug manifest를 기준으로 성립함을 정적 확인했다. 이번 기록에서는 연결된 휴대폰에서 `adb reverse` 두 포트와 Metro·Next를 동시에 띄우는 실기기 실행은 아직 다시 확인하지 않았다.
 
-## 회사에서 원격 WebView로 전환하는 메모 (2026-09-05)
+## 원격 WebView로 전환하는 메모 (2026-09-05)
 
-현재 handoff APK는 embedded 기준본으로 유지한다. 회사에서 화면을 실시간으로 수정할 때는 아래 둘 중 하나를 선택한다.
+현재 handoff APK는 embedded 기준본으로 유지한다. 화면을 실시간으로 수정할 때는 아래 둘 중 하나를 선택한다.
 
 1. 폰을 Mac에 USB로 연결할 수 있으면 Next.js 3210과 Metro 8081을 실행하고 adb reverse를 사용한다. 이 경로는 debug 전용 localhost HTTP이며 로컬 인증서가 필요 없다.
 2. 폰을 무선으로 사용하거나 다른 사람과 공유 시험하려면 Mac의 Next.js 서버 앞에 Cloudflare Tunnel 또는 ngrok을 실행해 임시 HTTPS origin을 만든다. Mac이 켜져 있기만 해서는 부족하며 Next.js 서버와 터널 프로세스가 모두 실행 중이고 Mac이 잠들지 않아야 한다.
 
 임시 HTTPS 주소를 EXPO_PUBLIC_WEBAPP_URL에 넣을 때는 URL의 사용자정보가 없어야 하고 앱은 그 정확한 origin만 허용한다. 터널 주소가 바뀌면 Native 앱 설정도 달라지므로 APK를 다시 빌드·설치한다. 고정 Amplify staging origin으로 전환한 뒤에는 Web만 배포한 변경은 APK 재설치 없이 반영된다.
 
-회사 Codex는 mobile/App.tsx의 EMBEDDED_WEBAPP·WEBAPP_URL 결정부와 mobile/scripts/build-android.sh의 release URL 검사를 먼저 확인한다. 실제 회사 AWS 값을 추측해 커밋하지 말고, 확정된 staging URL·Cognito callback/logout·API CORS origin을 같은 환경 기준으로 맞춘다.
+배포 담당자는 mobile/App.tsx의 EMBEDDED_WEBAPP·WEBAPP_URL 결정부와 mobile/scripts/build-android.sh의 release URL 검사를 먼저 확인한다. 실제 AWS 값을 추측해 커밋하지 말고, 확정된 staging URL·Cognito callback/logout·API CORS origin을 같은 환경 기준으로 맞춘다.
 
 
 ## 2026-09-05 실제 로그인·API Bridge 추가
@@ -164,6 +164,6 @@ Cognito app client callback은 `openiot-moodlight://auth/callback`이어야 한�
 
 Native는 PKCE 로그인과 refresh를 처리하고 `POST /session/bootstrap`으로 Tenant·Pool을 얻는다. WebView에는 로그인 상태와 안전한 식별자만 보내며 Access/Refresh token, 제품 QR registrationCode, 서버 registrationNonce는 보내지 않는다. 허용된 기기 목록·제어·Claim·예약·소유권 해제 요청만 Native가 JWT와 tenantId를 붙여 대행한다.
 
-제품 등록은 제품 QR → Claim 생성 → Security 2 → Wi-Fi → Claim 상태 조회 → finalize로 연결됐고, 실제 ESP32-S3·Android 앱·개인 격리 dev AWS에서 종단 검증했다. Wi-Fi 성공만으로 완료 처리하지 않고, 서버가 `RUNTIME_AUTHORIZED`를 반환한 뒤 첫 runtime `state`로 `ONLINE`이 확인될 때 등록 완료를 표시한다. 로컬 5필드 QR 시험은 `EXPO_PUBLIC_LOCAL_PROVISIONING_TEST_MODE=true`를 명시한 하드웨어 시험에서만 허용한다.
+제품 등록은 제품 QR → Claim 생성 → Security 2 → Wi-Fi → Claim 상태 조회 → finalize로 연결됐고, 실제 ESP32-S3·Android 앱·전용 격리 dev AWS에서 종단 검증했다. Wi-Fi 성공만으로 완료 처리하지 않고, 서버가 `RUNTIME_AUTHORIZED`를 반환한 뒤 첫 runtime `state`로 `ONLINE`이 확인될 때 등록 완료를 표시한다. 로컬 5필드 QR 시험은 `EXPO_PUBLIC_LOCAL_PROVISIONING_TEST_MODE=true`를 명시한 하드웨어 시험에서만 허용한다.
 
 현재 자동 검증은 Mobile 51/51과 TypeScript typecheck다. Native 의존성이 바뀌었으므로 기존 설치 앱에는 새 APK를 한 번 설치해야 한다. 이후 Embedded Web 화면 변경도 새 handoff/standalone APK가 필요하고, live/Amplify Web 화면만 바꾸면 APK 재설치는 필요하지 않다.

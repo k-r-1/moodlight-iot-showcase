@@ -1,5 +1,5 @@
 variable "enable_backend_integrations" {
-  description = "Opt in to the local Ingest/Scheduler Lambdas and AWS IoT runtime adapters after company values are confirmed."
+  description = "Opt in to the local Ingest/Scheduler Lambdas and AWS IoT runtime adapters after deployment values are confirmed."
   type        = bool
   default     = false
 }

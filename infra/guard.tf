@@ -1,19 +1,19 @@
 resource "terraform_data" "deployment_guard" {
   input = {
-    deployment_enabled       = var.deployment_enabled
-    company_values_confirmed = var.company_values_confirmed
+    deployment_enabled          = var.deployment_enabled
+    deployment_values_confirmed = var.deployment_values_confirmed
   }
 
   lifecycle {
     precondition {
       condition = !var.deployment_enabled || (
-        var.company_values_confirmed &&
+        var.deployment_values_confirmed &&
         var.project_token != "unconfirmed" &&
         var.owner_tag != "unconfirmed" &&
         var.aws_region == "ap-northeast-2" &&
         can(regex("^[0-9]{12}$", var.aws_account_id))
       )
-      error_message = "Deployment requires confirmed company values, Seoul ap-northeast-2, a non-placeholder project/owner, and a 12-digit AWS account ID."
+      error_message = "Deployment requires confirmed deployment values, Seoul ap-northeast-2, a non-placeholder project/owner, and a 12-digit AWS account ID."
     }
 
     precondition {
@@ -30,11 +30,11 @@ resource "terraform_data" "deployment_guard" {
     precondition {
       condition = !var.enable_iot_fleet || (
         var.deployment_enabled &&
-        startswith(var.project_token, "onboarding-juwon-") &&
+        startswith(var.project_token, "moodlight-demo-") &&
         var.environment == "dev" &&
         local.iot_topic_root_depth == 3
       )
-      error_message = "IoT/Fleet is limited to the isolated onboarding-juwon-* dev namespace and requires deployment_enabled=true."
+      error_message = "IoT/Fleet is limited to the isolated moodlight-demo-* dev namespace and requires deployment_enabled=true."
     }
 
     precondition {

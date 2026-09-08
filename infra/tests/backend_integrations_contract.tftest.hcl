@@ -9,7 +9,7 @@ run "backend_integrations_default_off" {
   # Keep this contract independent from a developer's ignored terraform.tfvars.
   variables {
     deployment_enabled              = false
-    company_values_confirmed        = false
+    deployment_values_confirmed     = false
     api_slice_enabled               = false
     enable_iot_fleet                = false
     enable_iot_rules                = false
@@ -32,22 +32,22 @@ run "backend_integrations_are_scoped" {
   command = plan
 
   variables {
-    project_token               = "onboarding-juwon-test-m4d2"
-    environment                 = "dev"
-    aws_account_id              = "123456789012"
-    aws_region                  = "ap-northeast-2"
-    owner_tag                   = "juwon"
-    deployment_enabled          = true
-    company_values_confirmed    = true
-    api_slice_enabled           = true
-    enable_iot_fleet            = true
-    enable_iot_rules            = true
+    project_token                   = "moodlight-demo-test-m4d2"
+    environment                     = "dev"
+    aws_account_id                  = "123456789012"
+    aws_region                      = "ap-northeast-2"
+    owner_tag                       = "demo-owner"
+    deployment_enabled              = true
+    deployment_values_confirmed     = true
+    api_slice_enabled               = true
+    enable_iot_fleet                = true
+    enable_iot_rules                = true
     enable_backend_integrations     = true
     enable_fleet_registration_guard = false
     enable_device_decommission      = false
-    cognito_callback_urls       = ["openiot-moodlight://auth/callback"]
-    cognito_logout_urls         = ["openiot-moodlight://auth/logout"]
-    cors_allow_origins          = ["http://localhost:3210"]
+    cognito_callback_urls           = ["openiot-moodlight://auth/callback"]
+    cognito_logout_urls             = ["openiot-moodlight://auth/logout"]
+    cors_allow_origins              = ["http://localhost:3210"]
   }
 
   assert {
@@ -66,7 +66,7 @@ run "backend_integrations_are_scoped" {
   assert {
     condition = (
       jsondecode(aws_iam_role.scheduler_execution[0].assume_role_policy).Statement[0].Condition.ArnEquals["aws:SourceArn"] ==
-      "arn:aws:scheduler:ap-northeast-2:123456789012:schedule-group/openiot-onboarding-juwon-test-m4d2-dev"
+      "arn:aws:scheduler:ap-northeast-2:123456789012:schedule-group/openiot-moodlight-demo-test-m4d2-dev"
     )
     error_message = "Scheduler trust must be limited to the one project schedule group."
   }
@@ -79,7 +79,7 @@ run "backend_integrations_are_scoped" {
   assert {
     condition = strcontains(
       local.command_topic_arn,
-      ":topic/onboarding-juwon-test-m4d2/dev/tenants/*/pools/*/openiot-onboarding-juwon-test-m4d2-dev-lamp-*/cmd",
+      ":topic/moodlight-demo-test-m4d2/dev/tenants/*/pools/*/openiot-moodlight-demo-test-m4d2-dev-lamp-*/cmd",
     )
     error_message = "Scheduled command publish must stay inside the project cmd topic tree."
   }
@@ -90,33 +90,33 @@ run "fleet_finalize_is_guarded_and_scoped" {
 
   override_resource {
     target = aws_dynamodb_table.domain["device"]
-    values = { arn = "arn:aws:dynamodb:ap-northeast-2:123456789012:table/openiot-onboarding-juwon-test-m4d2-dev-device" }
+    values = { arn = "arn:aws:dynamodb:ap-northeast-2:123456789012:table/openiot-moodlight-demo-test-m4d2-dev-device" }
   }
   override_resource {
     target = aws_dynamodb_table.domain["device_claim"]
-    values = { arn = "arn:aws:dynamodb:ap-northeast-2:123456789012:table/openiot-onboarding-juwon-test-m4d2-dev-device-claim" }
+    values = { arn = "arn:aws:dynamodb:ap-northeast-2:123456789012:table/openiot-moodlight-demo-test-m4d2-dev-device-claim" }
   }
   override_resource {
     target = aws_dynamodb_table.device_registry[0]
-    values = { arn = "arn:aws:dynamodb:ap-northeast-2:123456789012:table/openiot-onboarding-juwon-test-m4d2-dev-device-registry" }
+    values = { arn = "arn:aws:dynamodb:ap-northeast-2:123456789012:table/openiot-moodlight-demo-test-m4d2-dev-device-registry" }
   }
   override_resource {
     target = aws_iot_policy.bootstrap[0]
-    values = { arn = "arn:aws:iot:ap-northeast-2:123456789012:policy/openiot-onboarding-juwon-test-m4d2-dev-bootstrap" }
+    values = { arn = "arn:aws:iot:ap-northeast-2:123456789012:policy/openiot-moodlight-demo-test-m4d2-dev-bootstrap" }
   }
   override_resource {
     target = aws_iot_policy.runtime[0]
-    values = { arn = "arn:aws:iot:ap-northeast-2:123456789012:policy/openiot-onboarding-juwon-test-m4d2-dev-runtime" }
+    values = { arn = "arn:aws:iot:ap-northeast-2:123456789012:policy/openiot-moodlight-demo-test-m4d2-dev-runtime" }
   }
 
   variables {
-    project_token                   = "onboarding-juwon-test-m4d2"
+    project_token                   = "moodlight-demo-test-m4d2"
     environment                     = "dev"
     aws_account_id                  = "123456789012"
     aws_region                      = "ap-northeast-2"
-    owner_tag                       = "juwon"
+    owner_tag                       = "demo-owner"
     deployment_enabled              = true
-    company_values_confirmed        = true
+    deployment_values_confirmed     = true
     api_slice_enabled               = true
     enable_iot_fleet                = true
     enable_backend_integrations     = true
@@ -130,7 +130,7 @@ run "fleet_finalize_is_guarded_and_scoped" {
   assert {
     condition = (
       length(aws_iam_role_policy.api_fleet_finalize) == 1 &&
-      aws_lambda_function.api[0].environment[0].variables.IOT_PROVISIONING_THING_NAME_PREFIX == "openiot-onboarding-juwon-test-m4d2-dev-lamp-" &&
+      aws_lambda_function.api[0].environment[0].variables.IOT_PROVISIONING_THING_NAME_PREFIX == "openiot-moodlight-demo-test-m4d2-dev-lamp-" &&
       aws_lambda_function.api[0].environment[0].variables.IOT_PROVISIONING_THING_TYPE_NAME == aws_iot_thing_type.moodlamp[0].name &&
       aws_lambda_function.api[0].environment[0].variables.IOT_PROVISIONING_BOOTSTRAP_POLICY_NAME == aws_iot_policy.bootstrap[0].name &&
       aws_lambda_function.api[0].environment[0].variables.IOT_PROVISIONING_RUNTIME_POLICY_NAME == aws_iot_policy.runtime[0].name
@@ -151,13 +151,13 @@ run "device_decommission_requires_a_second_opt_in" {
   command = plan
 
   variables {
-    project_token               = "onboarding-juwon-test-m4d2"
+    project_token               = "moodlight-demo-test-m4d2"
     environment                 = "dev"
     aws_account_id              = "123456789012"
     aws_region                  = "ap-northeast-2"
-    owner_tag                   = "juwon"
+    owner_tag                   = "demo-owner"
     deployment_enabled          = true
-    company_values_confirmed    = true
+    deployment_values_confirmed = true
     api_slice_enabled           = true
     enable_iot_fleet            = true
     enable_backend_integrations = true

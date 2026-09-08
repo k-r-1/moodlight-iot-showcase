@@ -1,5 +1,5 @@
 output "resource_prefix" {
-  description = "Computed resource prefix; this does not mean it is company-approved."
+  description = "Computed resource prefix; this does not mean it is approved for deployment."
   value       = local.prefix
 }
 

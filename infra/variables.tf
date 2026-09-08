@@ -1,5 +1,5 @@
 variable "project_token" {
-  description = "Company-approved lowercase project token. The default is deliberately not deployable."
+  description = "Explicitly approved lowercase project token. The default is deliberately not deployable."
   type        = string
   default     = "unconfirmed"
 
@@ -10,7 +10,7 @@ variable "project_token" {
 }
 
 variable "environment" {
-  description = "Company-approved environment token."
+  description = "Explicitly approved environment token."
   type        = string
   default     = "dev"
 
@@ -43,7 +43,7 @@ variable "aws_account_id" {
 }
 
 variable "owner_tag" {
-  description = "Company-approved owner/cost attribution tag."
+  description = "Explicitly approved owner/cost attribution tag."
   type        = string
   default     = "unconfirmed"
 
@@ -59,8 +59,8 @@ variable "deployment_enabled" {
   default     = false
 }
 
-variable "company_values_confirmed" {
-  description = "Set true only after company confirms project, account, Region, naming, and tags."
+variable "deployment_values_confirmed" {
+  description = "Set true only after deployment owner confirms project, account, Region, naming, and tags."
   type        = bool
   default     = false
 }
@@ -98,7 +98,7 @@ variable "cognito_logout_urls" {
 }
 
 variable "additional_tags" {
-  description = "Additional company tags; reserved common tag keys cannot be overridden."
+  description = "Additional deployment tags; reserved common tag keys cannot be overridden."
   type        = map(string)
   default     = {}
 

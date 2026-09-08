@@ -1,5 +1,5 @@
 variable "api_slice_enabled" {
-  description = "Plans Cognito, HTTP API, and API Lambda only after their company values are confirmed."
+  description = "Plans Cognito, HTTP API, and API Lambda only after their deployment values are confirmed."
   type        = bool
   default     = false
 }
