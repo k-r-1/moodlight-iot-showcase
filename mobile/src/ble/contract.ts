@@ -1,0 +1,1 @@
+export const DEFAULT_BLE_SERVICE_UUID = "7d91fe2e-a88d-44c0-a3f0-3e01621ac282";

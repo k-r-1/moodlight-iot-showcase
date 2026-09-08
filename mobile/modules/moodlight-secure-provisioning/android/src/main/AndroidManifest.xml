@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+
+  <application>
+    <activity
+      android:name=".ProvisioningQrActivity"
+      android:exported="false"
+      android:screenOrientation="portrait"
+      android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+  </application>
+</manifest>

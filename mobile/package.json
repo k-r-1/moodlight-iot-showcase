@@ -1,0 +1,39 @@
+{
+  "name": "moodlight-mobile",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "private": true,
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "android:build": "./scripts/build-android.sh",
+    "android:handoff": "./scripts/build-android.sh handoff",
+    "android:standalone": "./scripts/build-android.sh standalone",
+    "android:install": "./scripts/install-android.sh",
+    "android:handoff:install": "./scripts/install-android.sh release",
+    "ios": "expo run:ios",
+    "postinstall": "node scripts/patch-react-native-gradle.cjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.cjs"
+  },
+  "dependencies": {
+    "base-64": "^1.0.0",
+    "expo": "~56.0.21",
+    "expo-auth-session": "~56.0.18",
+    "expo-build-properties": "~56.0.27",
+    "expo-crypto": "~56.0.5",
+    "expo-secure-store": "~56.0.4",
+    "expo-status-bar": "~56.0.4",
+    "expo-web-browser": "~56.0.6",
+    "react": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-ble-plx": "^3.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-webview": "^13.16.1"
+  },
+  "devDependencies": {
+    "@types/base-64": "^1.0.2",
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  }
+}

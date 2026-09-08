@@ -1,0 +1,25 @@
+# New, empty state validation defaults only. Never use this file to plan an
+# already deployed stack; restore its exact state and deployed inputs instead.
+project_token  = "unconfirmed"
+environment    = "dev"
+aws_region     = "ap-northeast-2"
+aws_account_id = ""
+owner_tag      = "unconfirmed"
+
+deployment_enabled       = false
+company_values_confirmed = false
+api_slice_enabled        = false
+enable_iot_fleet         = false
+enable_iot_rules         = false
+enable_backend_integrations = false
+enable_device_decommission  = false
+
+cognito_callback_urls = []
+cognito_logout_urls   = []
+
+additional_tags = {
+  Purpose = "moodlight-learning"
+}
+
+enable_point_in_time_recovery = true
+enable_deletion_protection    = true

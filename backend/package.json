@@ -1,0 +1,23 @@
+{
+  "name": "moodlight-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.9.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1126.0",
+    "@aws-sdk/client-iot": "^3.1127.0",
+    "@aws-sdk/client-iot-data-plane": "^3.1127.0",
+    "@aws-sdk/client-scheduler": "^3.1127.0",
+    "@aws-sdk/lib-dynamodb": "^3.1126.0"
+  }
+}

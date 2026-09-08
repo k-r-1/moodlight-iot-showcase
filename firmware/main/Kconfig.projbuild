@@ -1,0 +1,88 @@
+menu "Moodlight firmware"
+
+choice MOODLIGHT_LED_OUTPUT
+    prompt "RGB LED output"
+    default MOODLIGHT_LED_OUTPUT_ONBOARD_WS2812
+
+config MOODLIGHT_LED_OUTPUT_ONBOARD_WS2812
+    bool "Onboard WS2812 (GPIO48)"
+
+config MOODLIGHT_LED_OUTPUT_EXTERNAL_COMMON_CATHODE
+    bool "External common-cathode RGB LED (LEDC PWM)"
+
+endchoice
+
+config MOODLIGHT_EXTERNAL_LED_RED_GPIO
+    int "External RGB red GPIO"
+    depends on MOODLIGHT_LED_OUTPUT_EXTERNAL_COMMON_CATHODE
+    range 0 48
+    default 4
+
+config MOODLIGHT_EXTERNAL_LED_GREEN_GPIO
+    int "External RGB green GPIO"
+    depends on MOODLIGHT_LED_OUTPUT_EXTERNAL_COMMON_CATHODE
+    range 0 48
+    default 5
+
+config MOODLIGHT_EXTERNAL_LED_BLUE_GPIO
+    int "External RGB blue GPIO"
+    depends on MOODLIGHT_LED_OUTPUT_EXTERNAL_COMMON_CATHODE
+    range 0 48
+    default 6
+config MOODLIGHT_MQTT_RUNTIME
+    bool "Enable AWS IoT MQTT runtime"
+    default n
+    help
+        Subscribe to the device cmd topic and publish state, tele, and evt.
+        Endpoint and X.509 material must be generated into the Git-ignored
+        local/mqtt_credentials.h file.
+
+config MOODLIGHT_ALLOW_PLAINTEXT_DEMO_CREDENTIALS
+    bool "Allow plaintext credentials for an isolated demo board"
+    depends on MOODLIGHT_MQTT_RUNTIME
+    default n
+    help
+        Explicit exception for a disposable, isolated toy-project board.
+        The Fleet claim key and issued device identity remain readable from
+        flash/NVS, so never use this for production or a shared AWS scope.
+        Keep the claim certificate active only during enrollment.
+
+config MOODLIGHT_FLEET_PROVISIONING
+    bool "Enable AWS IoT Fleet Provisioning"
+    depends on MOODLIGHT_MQTT_RUNTIME
+    depends on (SECURE_FLASH_ENC_ENABLED && NVS_ENCRYPTION) || MOODLIGHT_ALLOW_PLAINTEXT_DEMO_CREDENTIALS
+    default n
+    help
+        Enroll an unregistered board with a Git-ignored Fleet claim
+        certificate, then store the issued device identity in NVS. Production
+        use requires flash encryption and encrypted NVS because the claim key
+        is part of the firmware image. The explicit plaintext demo exception
+        is only for an isolated, non-production board.
+        Normal builds keep this disabled. RegisterThing stores its complete
+        server-authorized topicBase, but runtime MQTT never starts in that same
+        boot. Restart the device only after the backend confirms the runtime
+        policy transition; an early restart remains unable to use runtime topics.
+
+config MOODLIGHT_MQTT_TELEMETRY_INTERVAL_SECONDS
+    int "MQTT telemetry interval (seconds)"
+    depends on MOODLIGHT_MQTT_RUNTIME
+    range 10 86400
+    default 60
+
+config MOODLIGHT_WIFI_REPROVISION_BUTTON
+    bool "Enable runtime Wi-Fi reprovision button"
+    default y
+
+config MOODLIGHT_WIFI_REPROVISION_BUTTON_GPIO
+    int "Wi-Fi reprovision button GPIO"
+    depends on MOODLIGHT_WIFI_REPROVISION_BUTTON
+    range 0 48
+    default 0
+
+config MOODLIGHT_WIFI_REPROVISION_HOLD_MS
+    int "Wi-Fi reprovision long-press duration (ms)"
+    depends on MOODLIGHT_WIFI_REPROVISION_BUTTON
+    range 1000 30000
+    default 5000
+
+endmenu

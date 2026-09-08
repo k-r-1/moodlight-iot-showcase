@@ -1,0 +1,41 @@
+# Dependencies and generated output
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+dist/
+build/
+.expo/
+/android/
+/ios/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+
+# Terraform local state and plans
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+
+# ESP-IDF output and local settings
+sdkconfig
+sdkconfig.old
+managed_components/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.log
